@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GOOGLE_APPLICATION_CREDENTIALS = credentials('gcp-service-account') // Update this with the actual credentials ID from Jenkins
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('my-ci-cd-service-account') // Update this with the actual credentials ID from Jenkins
         PROJECT_ID = 'animated-lyceum-423316-j4'
         INSTANCE_NAME = 'jenkins'
         ZONE = 'us-central1-a'
@@ -64,8 +64,8 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            echo 'Cleaning up...'
+            //sh 'rm -rf *'
         }
     }
 }
-
