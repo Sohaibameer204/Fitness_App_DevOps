@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        GOOGLE_APPLICATION_CREDENTIALS = credentials('my-ci-cd-service-account') // Update this with the actual credentials ID from Jenkins
+        GOOGLE_APPLICATION_CREDENTIALS = credentials('my-ci-cd-service-account') // Jenkins credential ID
         PROJECT_ID = 'animated-lyceum-423316-j4'
         INSTANCE_NAME = 'jenkins'
         ZONE = 'us-central1-a'
@@ -17,47 +17,43 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'echo "Building the application..."'
+                bat 'echo "Building the application..."'
                 // For example, if you're using Maven:
-                // sh 'mvn clean install'
+                // bat 'mvn clean install'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'echo "Running tests..."'
+                bat 'echo "Running tests..."'
                 // For example, if you're using Maven:
-                // sh 'mvn test'
+                // bat 'mvn test'
             }
         }
 
         stage('Package') {
             steps {
-                sh 'echo "Packaging the application..."'
+                bat 'echo "Packaging the application..."'
                 // For example, if you're creating a WAR file:
-                // sh 'mvn package'
+                // bat 'mvn package'
             }
         }
 
         stage('Deploy') {
             steps {
-                // Install Google Cloud SDK if not installed
-                sh 'curl -O https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-367.0.0-linux-x86_64.tar.gz'
-                sh 'tar -zxvf google-cloud-sdk-367.0.0-linux-x86_64.tar.gz'
-                sh './google-cloud-sdk/install.sh -q'
-                sh 'source ./google-cloud-sdk/path.bash.inc'
+                withCredentials([file(credentialsId: 'my-ci-cd-service-account', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    // Authenticate with GCP
+                    bat 'gcloud auth activate-service-account --key-file=%GOOGLE_APPLICATION_CREDENTIALS%'
 
-                // Authenticate with GCP
-                sh 'gcloud auth activate-service-account --key-file=$GOOGLE_APPLICATION_CREDENTIALS'
+                    // Set the project
+                    bat 'gcloud config set project %PROJECT_ID%'
 
-                // Set the project
-                sh 'gcloud config set project $PROJECT_ID'
-
-                // Deploy the application, for example using SCP to copy files to the instance
-                sh 'gcloud compute scp --zone=$ZONE ./path-to-your-deployable-package $INSTANCE_NAME:/path-on-instance'
-                
-                // Optionally, start/restart your application on the instance
-                sh 'gcloud compute ssh $INSTANCE_NAME --zone=$ZONE --command="sudo systemctl restart your-app-service"'
+                    // Deploy the application, for example using SCP to copy files to the instance
+                    bat 'gcloud compute scp --zone=%ZONE% path-to-your-deployable-package %INSTANCE_NAME%:/path-on-instance'
+                    
+                    // Optionally, start/restart your application on the instance
+                    bat 'gcloud compute ssh %INSTANCE_NAME% --zone=%ZONE% --command="sudo systemctl restart your-app-service"'
+                }
             }
         }
     }
@@ -65,7 +61,7 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            //sh 'rm -rf *'
+            //bat 'rm -rf *'
         }
     }
 }
