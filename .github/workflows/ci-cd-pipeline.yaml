@@ -1,0 +1,55 @@
+name: CI/CD Pipeline for Fitness App
+
+on:
+  push:
+    branches:
+      - main  # Run workflow on push to main branch
+  pull_request:
+    branches:
+      - main  # Run workflow on pull requests to main
+
+jobs:
+  build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4  # Clones repo
+
+      - name: Set Up Docker
+        uses: docker/setup-buildx-action@v3  # Enables better Docker builds
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.sohaibkhan204 }}
+          password: ${{ secrets.TAQWAeman#123 }}
+
+      - name: Build & Push Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: sohaibkhan204/fitness-app:latest
+
+  deploy:
+    name: Deploy to Minikube
+    runs-on: ubuntu-latest
+    needs: build  # Run only after build completes
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4  # Clone repo again
+
+      - name: Set Up Kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'  # Install latest kubectl
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
+          kubectl rollout status deployment/my-app
