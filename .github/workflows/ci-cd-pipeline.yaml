@@ -35,25 +35,32 @@ jobs:
           tags: sohaibkhan204/fitness-app:latest
 
   deploy:
-    name: Deploy to Minikube
-    runs-on: ubuntu-latest
-    needs: build  # Run only after build completes
+  name: Deploy to Minikube
+  runs-on: ubuntu-latest
+  needs: build  # Run only after build completes
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4  # Clone repo again
+  steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4  # Clone repo again
 
-      - name: Set Up Kubectl
-        uses: azure/setup-kubectl@v3
-        with:
-          version: 'latest'  # Install latest kubectl
+    - name: Set Up Kubectl
+      uses: azure/setup-kubectl@v3
+      with:
+        version: 'latest'  # Install latest kubectl
 
-      - name: Set kubernetes Context
-        run: |
-          kubectl config use-context minikube
+    - name: Start Minikube
+      run: minikube start
 
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f my-app-k8s/deployment.yaml --validate=false
-          kubectl apply -f my-app-k8s/service.yaml  --validate=false
-          kubectl rollout status deployment/my-app  --validate=false
+    - name: Ensure Minikube Context
+      run: |
+        kubectl config get-contexts | grep -q 'minikube' || kubectl config set-context minikube
+
+    - name: Set kubernetes Context
+      run: |
+        kubectl config use-context minikube
+
+    - name: Deploy to Kubernetes
+      run: |
+        kubectl apply -f my-app-k8s/deployment.yaml --validate=false
+        kubectl apply -f my-app-k8s/service.yaml  --validate=false
+        kubectl rollout status deployment/my-app  --validate=false
