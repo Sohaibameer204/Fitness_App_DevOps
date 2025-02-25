@@ -23,7 +23,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME}}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Build & Push Docker Image
@@ -48,12 +48,13 @@ jobs:
         with:
           version: 'latest'  # Install latest kubectl
 
-      - name: Set kubernetes Context
+      - name: Verify Kubernetes Context
         run: |
-          kubectl config use-context minikube
+          kubectl config current-context
+          kubectl cluster-info
 
       - name: Deploy to Kubernetes
         run: |
           kubectl apply -f my-app-k8s/deployment.yaml --validate=false
           kubectl apply -f my-app-k8s/service.yaml  --validate=false
-          kubectl rollout status deployment/my-app  --validate=false
+          kubectl rollout status deployment/my-app
