@@ -43,6 +43,17 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4  # Clone repo again
 
+      - name: Install Minikube
+        run: |
+          curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+          chmod +x minikube
+          sudo mv minikube /usr/local/bin/
+
+      - name: Start Minikube
+        run: |
+          minikube start --driver=docker
+          minikube status
+
       - name: Set Up Kubectl
         uses: azure/setup-kubectl@v3
         with:
