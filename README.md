@@ -4,12 +4,10 @@
 
   
   <p align="left">
-    <a href="https://www.youtube.com/channel/UCILovaLl2fUPAww1bGJ4sJQ?sub_confirmation=1"><img alt="Youtube" title="Youtube"  src="https://img.shields.io/badge/-Subscribe-red?style=for-the-badge&logo=youtube&logoColor=white"/></a>
+    <a Applied DevOps containerization,orchestration,CI/CD,Iac,Ansible /></a>
     <p>
-      Watch Tutorial on YouTube <a href="https://www.youtube.com/playlist?list=PLKWMD009Q4qScuZtpIsr-LaLl5dbDQcKb" target="_blank">Fitness App in React Native (Expo Router, Reanimated)</a>
+      </a>
     </p>
-    
-  </p>
   
 
 ## Get Started
